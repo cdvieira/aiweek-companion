@@ -559,21 +559,24 @@ const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
 function fmtTime(min){
-  const h = Math.floor(min/60), m = min%60;
+  const normalized = normalizeDayMinutes(min);
+  const h = Math.floor(normalized/60), m = normalized%60;
   const ap = h >= 12 ? 'PM' : 'AM';
   const h12 = ((h+11)%12)+1;
   return `${h12}:${String(m).padStart(2,'0')} ${ap}`;
 }
 
+// Normalize absolute minutes to a same-day minute value [0, 1439].
 function normalizeDayMinutes(min){
   return ((min % 1440) + 1440) % 1440;
 }
 
+// Shift session start/end times by a timezone offset and refresh formatted labels.
 function applyTimezoneOffset(sessions, offsetMinutes){
   const safeOffset = Number.isFinite(offsetMinutes) ? offsetMinutes : 0;
   return sessions.map(s => {
-    const startMin = normalizeDayMinutes(s.startMin + safeOffset);
-    const endMin = normalizeDayMinutes(s.endMin + safeOffset);
+    const startMin = s.startMin + safeOffset;
+    const endMin = s.endMin + safeOffset;
     return {
       ...s,
       startMin,
