@@ -566,17 +566,16 @@ function fmtTime(min){
   return `${h12}:${String(m).padStart(2,'0')} ${ap}`;
 }
 
-// Normalize absolute minutes to a same-day minute value [0, 1439].
+// Normalize absolute minutes to [0, 1439] for clock display; double modulo keeps negatives valid.
 function normalizeDayMinutes(min){
   return ((min % 1440) + 1440) % 1440;
 }
 
 // Shift session start/end times by a timezone offset and refresh formatted labels.
 function applyTimezoneOffset(sessions, offsetMinutes){
-  const safeOffset = Number.isFinite(offsetMinutes) ? offsetMinutes : 0;
   return sessions.map(s => {
-    const startMin = s.startMin + safeOffset;
-    const endMin = s.endMin + safeOffset;
+    const startMin = s.startMin + offsetMinutes;
+    const endMin = s.endMin + offsetMinutes;
     return {
       ...s,
       startMin,
