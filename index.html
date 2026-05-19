@@ -551,6 +551,7 @@ const FIT_DESCS = {
   2: 'Tangential. Only if curious.',
   1: 'Skip. Off-topic for you.'
 };
+const TIMEZONE_OFFSET_MINUTES = 60;
 
 // =================== HELPERS ===================
 const $ = s => document.querySelector(s);
@@ -563,10 +564,10 @@ function fmtTime(min){
   return `${h12}:${String(m).padStart(2,'0')} ${ap}`;
 }
 
-function applyTimezoneOffset(sessions, offsetMin){
+function applyTimezoneOffset(sessions, offsetMinutes){
   return sessions.map(s => {
-    const startMin = s.startMin + offsetMin;
-    const endMin = s.endMin + offsetMin;
+    const startMin = s.startMin + offsetMinutes;
+    const endMin = s.endMin + offsetMinutes;
     return {
       ...s,
       startMin,
@@ -969,7 +970,7 @@ tickInd(); setInterval(tickInd, 30000);
 fetch('sessions.json', { cache: 'no-cache' })
   .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
   .then(data => {
-    SESSIONS = applyTimezoneOffset(data, 60);
+    SESSIONS = applyTimezoneOffset(data, TIMEZONE_OFFSET_MINUTES);
     attachEvents();
     const td = currentEventDay();
     state.day = td;
